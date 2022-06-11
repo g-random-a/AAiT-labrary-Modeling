@@ -10,6 +10,14 @@ def getFileContents(filename):
     print(p)
     return open(p, 'r').read()
 
+def rotationMatrix(degree):
+    radian = degree * np.pi / 180.0
+
+    mat = np.array([
+    ], dtype=np.float32)
+
+    return mat
+
 def init():
     global vao, vbo, ebo, shader
     pygame.init()
@@ -109,7 +117,7 @@ def draw(count):
     transk = glGetUniformLocation(shader, 'transform')
     # print(transform.rotationMatrix(30))
 
-    # # glUniformMatrix4fv(transk, 1, GL_FALSE, rotationMatrix(count))
+    glUniformMatrix4fv(transk, 1, GL_FALSE, rotationMatrix(count))
 
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, None)
 
