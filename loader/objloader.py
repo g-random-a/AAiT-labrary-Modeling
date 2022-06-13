@@ -30,7 +30,7 @@ class OBJ:
             elif values[0] == 'map_Kd':
                 mtl[values[0]] = values[1]
                 imagefile = os.path.join(dirname, mtl['map_Kd'])
-                mtl['texture_Kd'] = cls.loadTexture(imagefile)
+                mtl['texture_Kd'] = self.loadTexture(imagefile)
             else:
                 mtl[values[0]] = list(map(float, values[1:]))
         return contents
@@ -84,6 +84,32 @@ class OBJ:
             self.generate()
 
     
+
+    def generate(self):
+        self.gl_list = glGenLists(1)
+        glNewList(self.gl_list, GL_COMPILE)
+        glEnable(GL_TEXTURE_2D)
+        glFrontFace(GL_CCW)
+        for face in self.faces:
+            vertices, normals, texture_coords, material = face
+
+            mtl = self.mtl[material]
+            if 'texture_Kd' in mtl:
+                glBindTexture(GL_TEXTURE_2D, mtl['texture_Kd'])
+            else:
+                glColor(*mtl['Kd'])
+                print(*mtl['Kd'])
+
+            glBegin(GL_POLYGON)
+            for i in range(len(vertices)):
+                if normals[i] > 0:
+                    glNormal3fv(self.normals[normals[i] - 1])
+                if texture_coords[i] > 0:
+                    glTexCoord2fv(self.texcoords[texture_coords[i] - 1])
+                glVertex3fv(self.vertices[vertices[i] - 1])
+            glEnd()
+        glDisable(GL_TEXTURE_2D)
+        glEndList()
 
     def render(self):
         glCallList(self.gl_list)
