@@ -1,107 +1,79 @@
-import pygame
-from OpenGL.GL import *
+import sys, pygame
 from pygame.locals import *
-from OpenGL.GL.shaders import *
+from pygame.constants import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from camera import Camera
+from Loader.objloader import *
 import numpy as np
+from OpenGL.GL.shaders import *
 import os
+from PIL import *
 
 def getFileContents(filename):
     p = os.path.join(os.getcwd(), "shaders", filename)
-    print(p)
     return open(p, 'r').read()
 
-def rotationMatrix(degree):
-    radian = degree * np.pi / 180.0
+pygame.init()
+cam = Camera()
+vport = (900,700)
+height = vport[0]/2
+width = vport[1]/2
+pygame.display.set_mode(vport, OPENGL | DOUBLEBUF)
 
-    mat = np.array([
-    ], dtype=np.float32)
-
-    return mat
-
-def init():
-    global vao, vbo, ebo, shader
-    pygame.init()
-    display = (500, 500)
-    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glEnable(GL_DEPTH_TEST)
-    glDepthFunc(GL_LESS)
-    glViewport(0, 0, 500, 500)
-
-
-    vertices = np.array([
-
-    ], dtype=np.float32)
-
-    # Creating Indices
-
-    indices = np.array(
-        [
-
-        ], dtype=np.uint32)
-
-    vertexShader = compileShader(getFileContents(
-        "triangle.vertex.shader"), GL_VERTEX_SHADER)
-    fragmentShader = compileShader(getFileContents(
-        "triangle.fragment.shader"), GL_FRAGMENT_SHADER)
-    shader = glCreateProgram()
-
-
-    shader = glCreateProgram()
-    glAttachShader(shader, vertexShader)
-    glAttachShader(shader, fragmentShader)
-    glLinkProgram(shader)
-
-    VBO = glGenBuffers(1)
-
-    EBO = glGenBuffers(1)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO)
-    glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
-
-    position = glGetAttribLocation(shader, 'position')
-    glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, vertices.itemsize * 6, ctypes.c_void_p(0))
-    glEnableVertexAttribArray(position)
-    color = glGetAttribLocation(shader, 'color')
-    glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, vertices.itemsize * 6, ctypes.c_void_p(12))
-    glEnableVertexAttribArray(color)
-
-    glUseProgram(shader)
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+vertexes = np.array([
     
+]) #to be filled 
+vertexShader = compileShader(getFileContents(
+        "triangle.vertex.shader"), GL_VERTEX_SHADER)
+fragmentShader = compileShader(getFileContents(
+    "triangle.fragment.shader"), GL_FRAGMENT_SHADER)
+
+program = glCreateProgram()
+glAttachShader(program, vertexShader)
+glAttachShader(program, fragmentShader)
+glLinkProgram(program)
+
+glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 0.0))
+glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0))
+glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1.0))
+glEnable(GL_LIGHT0)
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          8 * vertexes.itemsize, ctypes.c_void_p(0))
+glEnableVertexAttribArray(0)
+
+# colorLocation = glGetAttribLocation(program, "color");
+glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                        8 * vertexes.itemsize, ctypes.c_void_p(12))
+glEnableVertexAttribArray(1)
+
+# texLocation = glGetAttribLocation(program, "texCoord");
+glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 
+    8*vertexes.itemsize, ctypes.c_void_p(24))
 
 
-def draw(count):
+obj = OBJ("mesh/proj prac 1.obj", swapyz=True)
+obj.generate()
+
+clock = pygame.time.Clock()
+
+
+
+
+while 1:
+    clock.tick(30)
+    for e in pygame.event.get():
+        if e.type == QUIT:
+            sys.exit()
+        cam.takeAc(e)
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    # enable depth test
-    glEnable(GL_DEPTH_TEST)
-    # apply the depth checking function
-    glDepthFunc(GL_LESS)
-    # Draw Triangle
+    glLoadIdentity()
 
-    transk = glGetUniformLocation(shader, 'transform')
+    glRotate(cam.rotx, 1, 0, 0)
+    glTranslate(cam.transX/20., cam.transY/20., - cam.zpos)
+    glScale(cam.sx, cam.sy, cam.sz)
+    glRotate(cam.rotx, 0, 1, 0)
+    obj.render()
 
-    glUniformMatrix4fv(transk, 1, GL_FALSE, rotationMatrix(count))
-
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, None)
-
-def main():
-    init()
-    count = 0
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-        if count == 360: count = 0
-        draw(count)
-        count += 1
-        glRotate(1, 3, 1, 3)
-        pygame.display.flip()
-        pygame.time.wait(10)
-
-
-main()
+    pygame.display.flip()
