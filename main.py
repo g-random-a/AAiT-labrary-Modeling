@@ -4,7 +4,7 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from camera import Camera
-from Loader.objloader import *
+from loader.objloader import *
 import numpy as np
 from OpenGL.GL.shaders import *
 import os
@@ -50,14 +50,23 @@ glEnableVertexAttribArray(1)
 # texLocation = glGetAttribLocation(program, "texCoord");
 glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 
     8*vertexes.itemsize, ctypes.c_void_p(24))
-
+glEnableVertexAttribArray(2)
+glEnable(GL_LIGHTING)
+glEnable(GL_COLOR_MATERIAL)
+glEnable(GL_DEPTH_TEST)
+glShadeModel(GL_SMOOTH) 
 
 obj = OBJ("mesh/proj prac 1.obj", swapyz=True)
 obj.generate()
 
 clock = pygame.time.Clock()
 
-
+glMatrixMode(GL_PROJECTION)
+glLoadIdentity()
+width, height = vport
+gluPerspective(90.0, width/float(height), 1, 100.0)
+glEnable(GL_DEPTH_TEST)
+glMatrixMode(GL_MODELVIEW)
 
 
 while 1:
