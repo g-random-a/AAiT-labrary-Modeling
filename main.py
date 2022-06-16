@@ -3,7 +3,7 @@ from pygame.locals import *
 from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from camera import Camera
+from camera.camera import Camera
 from loader.objloader import *
 import numpy as np
 from OpenGL.GL.shaders import *
