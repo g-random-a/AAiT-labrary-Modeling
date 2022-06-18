@@ -32,4 +32,25 @@ class Camera:
             if self.move:
                 self.transX -= i
                 self.transY += j
-       
+        else:
+            keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_UP]:
+                self.zpos -=1
+            if keys_pressed[pygame.K_DOWN]:
+                self.zpos +=1
+            if keys_pressed[pygame.K_LEFT]:
+                self.transX += self.speed
+            if keys_pressed[pygame.K_RIGHT]:
+                self.transX -= self.speed
+            if keys_pressed[pygame.K_a]:
+                self.transX -= self.speed
+            if keys_pressed[pygame.K_d]:
+                self.transX += self.speed
+            if keys_pressed[pygame.K_w]:
+                self.sx *= 1.05 
+                self.sy *= 1.05 
+                self.sz *= 1.05 
+            if keys_pressed[pygame.K_s]:
+                self.sx *= 0.95 
+                self.sy *= 0.95 
+                self.sz *= 0.95
