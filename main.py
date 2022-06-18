@@ -12,6 +12,15 @@ from PIL import *
  
 pygame.init() 
 cam = Camera() 
+pygame.display.set_mode((800,600) , OPENGL | DOUBLEBUF) 
+glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 0.0)) 
+glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0)) 
+glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1.0)) 
+glEnable(GL_LIGHT0) 
+glEnable(GL_LIGHTING) 
+glEnable(GL_COLOR_MATERIAL) 
+glEnable(GL_DEPTH_TEST) 
+glShadeModel(GL_SMOOTH)  
  
 obj = OBJ("mesh/of3.obj") 
 # obj.generate() 
