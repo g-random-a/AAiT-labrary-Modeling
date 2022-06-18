@@ -45,7 +45,23 @@ class OBJ:
                 material = values[1]
             elif values[0] == 'mtllib':
                 self.mtl = self.loadMaterial(os.path.join(dirname, values[1]))
-            
+            elif values[0] == 'f':
+                face = []
+                texcoords = []
+                norms = []
+                for v in values[1:]:
+                    w = v.split('/')
+                    face.append(int(w[0]))
+                    if len(w) >= 2 and len(w[1]) > 0:
+                        texcoords.append(int(w[1]))
+                    else:
+                        texcoords.append(0)
+                    if len(w) >= 3 and len(w[2]) > 0:
+                        norms.append(int(w[2]))
+                    else:
+                        norms.append(0)
+                self.faces.append((face, norms, texcoords, material))
+        self.generate()
 
     
 
